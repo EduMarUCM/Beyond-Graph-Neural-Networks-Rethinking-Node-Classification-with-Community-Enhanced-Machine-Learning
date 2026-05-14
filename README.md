@@ -10,6 +10,7 @@ The main objective is to facilitate the reproducibility of the results and provi
 
 ## Repository Structure
 
+```text
 .
 ├── data/
 │   ├── raw/                # Original datasets
@@ -18,16 +19,16 @@ The main objective is to facilitate the reproducibility of the results and provi
 │
 ├── notebooks/              # Jupyter notebooks for analysis and experimentation
 │
-├── src/                    # Main source code
+├── src/
 │   ├── preprocessing/      # Data cleaning and transformation scripts
 │   ├── models/             # Models and training scripts
 │   ├── evaluation/         # Evaluation and metrics
 │   └── utils/              # Utility functions
 │
 ├── results/                # Results, figures, and outputs
-│
 ├── requirements.txt        # Project dependencies
 └── README.md
+```
 
 ## Usage
 
