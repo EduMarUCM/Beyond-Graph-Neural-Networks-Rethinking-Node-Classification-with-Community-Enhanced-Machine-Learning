@@ -40,11 +40,9 @@ The main objective is to facilitate the reproducibility of the results and provi
 
 ## Datasets
 
-Known eight open-access graph datasets in Node Classification tasks
+Known open-access graph datasets in Node Classification tasks
 
-
-
-
+![Datasets](images/datasets.png)
 
 ## Technologies Used
 
