@@ -10,22 +10,23 @@ The main objective is to facilitate the reproducibility of the results and provi
 
 ## Repository Structure
 
-── data/
-│   ├── raw/                # Datos originales
-│   ├── processed/          # Datos procesados
-│   └── external/           # Datos externos o complementarios
+.
+├── data/
+│   ├── raw/                # Original datasets
+│   ├── processed/          # Processed datasets
+│   └── external/           # External or complementary data
 │
-├── notebooks/              # Jupyter notebooks para análisis y experimentación
+├── notebooks/              # Jupyter notebooks for analysis and experimentation
 │
-├── src/                    # Código fuente principal
-│   ├── preprocessing/      # Scripts de limpieza y transformación
-│   ├── models/             # Modelos y entrenamiento
-│   ├── evaluation/         # Evaluación y métricas
-│   └── utils/              # Funciones auxiliares
+├── src/                    # Main source code
+│   ├── preprocessing/      # Data cleaning and transformation scripts
+│   ├── models/             # Models and training scripts
+│   ├── evaluation/         # Evaluation and metrics
+│   └── utils/              # Utility functions
 │
-├── results/                # Resultados, gráficas y outputs
+├── results/                # Results, figures, and outputs
 │
-├── requirements.txt        # Dependencias del proyecto
+├── requirements.txt        # Project dependencies
 └── README.md
 
 ## Usage
