@@ -40,13 +40,11 @@ The main objective is to facilitate the reproducibility of the results and provi
 
 ## Datasets
 
-The datasets used in this research include:
+Known eight open-access graph datasets in Node Classification tasks
 
-Dataset 1: descripción breve.
 
-Dataset 2: descripción breve.
 
-Dataset 3: descripción breve.
+
 
 ## Technologies Used
 
