@@ -44,6 +44,10 @@ Known open-access graph datasets in Node Classification tasks
 
 ![Datasets](images/datasets.png)
 
+<p align="center">
+  <img src="images/datasets.png" width="700"/>
+</p>
+
 ## Technologies Used
 
 R
