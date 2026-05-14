@@ -12,21 +12,10 @@ The main objective is to facilitate the reproducibility of the results and provi
 
 ```text
 .
-├── data/
-│   ├── raw/                # Original datasets
-│   ├── processed/          # Processed datasets
-│   └── external/           # External or complementary data
-│
-├── notebooks/              # Jupyter notebooks for analysis and experimentation
-│
-├── src/
-│   ├── preprocessing/      # Data cleaning and transformation scripts
-│   ├── models/             # Models and training scripts
-│   ├── evaluation/         # Evaluation and metrics
-│   └── utils/              # Utility functions
-│
-├── results/                # Results, figures, and outputs
-├── requirements.txt        # Project dependencies
+├── images/                 # Images
+├── raw_data/               # Original datasets
+├── resolution_values/      # Resolutions for each dataset for Leidenalgorithm
+├── utils/                  # Required intermediate functions
 └── README.md
 ```
 
