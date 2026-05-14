@@ -10,8 +10,7 @@ El objetivo principal es facilitar la reproducibilidad de los resultados y servi
 
 ## Contenido del repositorio
 
-.
-├── data/
+── data/
 │   ├── raw/                # Datos originales
 │   ├── processed/          # Datos procesados
 │   └── external/           # Datos externos o complementarios
