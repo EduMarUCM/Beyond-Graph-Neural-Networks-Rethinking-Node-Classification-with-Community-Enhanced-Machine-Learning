@@ -1,6 +1,6 @@
-# Título del Proyecto
+# Beyond Graph Neural Networks: Rethinking Node Classification with Community-Enhanced Machine Learning
 
-Repositorio con el código y los datasets utilizados en el desarrollo del artículo de tesis [Título de la tesis o artículo].
+Repository containing the code and datasets used in the development of the article [Beyond Graph Neural Networks: Rethinking Node Classification with Community-Enhanced Machine Learning].
 
 ## Descripción
 
@@ -28,34 +28,15 @@ El objetivo principal es facilitar la reproducibilidad de los resultados y servi
 ├── requirements.txt        # Dependencias del proyecto
 └── README.md
 
-## Requisitos
-
-Instala las dependencias necesarias con:
-
-pip install -r requirements.txt
-
 ## Uso
 
 1. Clonar el repositorio
+   
+3. Ejecutar el código:
+   
+   * 1_Splits
+   * 2_Experiment
 
-git clone https://github.com/tu-usuario/tu-repositorio.git
-cd tu-repositorio
-
-2. Preparar los datos
-
-Coloca los datasets en la carpeta correspondiente:
-
-data/raw/
-
-3. Ejecutar el código
-
-Ejemplo:
-
-python src/main.py
-
-O ejecutar notebooks:
-
-jupyter notebook
 
 ## Datasets
 
