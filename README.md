@@ -42,8 +42,6 @@ The main objective is to facilitate the reproducibility of the results and provi
 
 Known open-access graph datasets in Node Classification tasks
 
-![Datasets](images/datasets.png)
-
 <p align="center">
   <img src="images/datasets.png" width="700"/>
 </p>
