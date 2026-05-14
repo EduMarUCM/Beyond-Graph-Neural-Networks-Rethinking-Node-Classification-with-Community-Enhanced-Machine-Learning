@@ -14,7 +14,7 @@ The main objective is to facilitate the reproducibility of the results and provi
 .
 ├── images/                 # Images
 ├── raw_data/               # Original datasets
-├── resolution_values/      # Resolutions for each dataset for Leidenalgorithm
+├── resolution_values/      # Resolutions for each dataset for Leiden algorithm
 ├── utils/                  # Required intermediate functions
 └── README.md
 ```
