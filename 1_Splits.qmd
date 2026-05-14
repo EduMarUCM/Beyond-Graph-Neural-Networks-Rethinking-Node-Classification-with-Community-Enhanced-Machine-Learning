@@ -1,0 +1,224 @@
+---
+title: "CDA - Splits"
+format:
+  html:
+    theme: [default, style.scss]
+    toc: true
+    toc-location: left
+    toc-title: indice
+    toc-depth: 5
+    fig-cap-location: margin
+editor: visual
+---
+
+[**Paquetes necesarios**]{.hl-yellow}
+
+```{r}
+#| message: false
+#| warning: false
+
+# Clear environment
+
+rm(list = ls())
+
+# Required libraries
+
+library(readxl)
+library(tidyverse)
+library(tidygraph)
+library(igraph)
+library(ggraph)
+library(glue)
+library(ggthemes)
+library(DT)
+library(tidymodels)
+library(ggpubr)
+library(stratification)
+library(sqldf)
+library(tidymodels)
+library(emayili)
+source("./utils/prop_com.R")
+source("./utils/custom_vfold_cv.R")
+```
+
+# Splits
+
+## ML
+
+```{r, eval=FALSE}
+#| message: false
+#| warning: false
+
+# Input datasets: citeseer, cora, pubmed...
+
+dataset_names_list <- c("cora") 
+
+# Save Splits on path
+
+for (dataset_name in dataset_names_list)
+{
+      print(dataset_name)
+      
+      # Nodes path
+  
+      path_nodes_rds <- paste("./raw_data/",dataset_name,"/",dataset_name,"_nodes.rds", sep = "")
+      
+      nodes_df <- readRDS(path_nodes_rds)
+      
+      # Splits
+      
+      set.seed() #Input seed
+      
+      cv_splits <- vfold_cv(data = nodes_df |>  select(-node_id), v = 5, repeats = 20, strata = target) 
+      
+      # Splits path
+      
+      path_for_cv <- paste("./cv_splits/",dataset_name,"/ml/",dataset_name,"_cv_ml.rds", sep = "")
+      
+      # Delete file if exists
+      
+      file.remove(path_for_cv)
+      
+      # Save on RDS
+      
+      saveRDS(cv_splits, file = path_for_cv)
+}
+```
+
+## GRAPH + ML
+
+```{r, eval=FALSE}
+#| message: false
+#| warning: false
+
+# Input datasets: citeseer, cora, pubmed...
+
+dataset_names_list <- c("cora") 
+
+for (dataset_name in dataset_names_list)
+{
+    # Nodes path
+    
+    path_nodes_rds <- paste("./raw_data/",dataset_name,"/",dataset_name,"_nodes.rds", sep = "")
+      
+    nodes_df <- readRDS(path_nodes_rds)
+
+    # Edges path
+      
+    path_edges_rds <- paste("./raw_data/",dataset_name,"/",dataset_name,"_edges.rds", sep = "")
+    
+    edges_df <- readRDS(path_edges_rds)
+    
+    # Graph
+    
+    graph <- tbl_graph(nodes = nodes_df, edges = edges_df, directed = FALSE, node_key = "node_id")
+
+    # Resolutions for Leiden
+    
+    path_resolutions_rds <- paste("./resolution_values/resolution_df.rds", sep = "")
+    resolution_df <- readRDS(path_resolutions_rds)
+    
+    resolution_list <- resolution_df |>  filter(dataset == dataset_name)|> select(resolution)
+    resolution_list <- resolution_list$resolution
+    
+    # Community based on the resolution (Leiden)
+    
+    i <- 1
+    
+    for (resolution_value in resolution_list)
+    {
+      
+        set.seed() #Input seed
+      
+        # Leiden algorithm
+        
+        leiden_cluster <- cluster_leiden(graph, resolution = resolution_value)
+        
+        nodes_df_cluster <- nodes_df |> mutate(community_id = leiden_cluster$membership)|> relocate(community_id, .after = target)
+        
+        cv_folds <- custom_vfold_cv_all_features(data = nodes_df_cluster, v = 5, repeats = 20, strata = target)
+        
+        # Splits path
+        
+        output <- list("resolution" = resolution_value,"cv_splits"  = cv_folds)
+        
+        path_for_cv_res <- paste("./cv_splits/",dataset_name,"/graph_ml/",dataset_name,"_cv_graph_ml_",i,".rds", sep = "")
+        
+        file.remove(path_for_cv_res)
+        
+        saveRDS(output, file = path_for_cv_res)
+        
+        i <- i + 1
+    
+    }
+}
+```
+
+## GRAPH
+
+```{r, eval=FALSE}
+#| message: false
+#| warning: false
+
+# Input datasets: citeseer, cora, pubmed...
+
+dataset_names_list <- c("cora") 
+
+for (dataset_name in dataset_names_list)
+{
+    # Nodes path
+    
+    path_nodes_rds <- paste("./raw_data/",dataset_name,"/",dataset_name,"_nodes.rds", sep = "")
+      
+    nodes_df <- readRDS(path_nodes_rds)
+
+    # Edges path
+      
+    path_edges_rds <- paste("./raw_data/",dataset_name,"/",dataset_name,"_edges.rds", sep = "")
+    
+    edges_df <- readRDS(path_edges_rds)
+    
+    # Graph
+    
+    graph <- tbl_graph(nodes = nodes_df, edges = edges_df, directed = FALSE, node_key = "node_id")
+    
+    # Resolutions for Leiden
+    
+    path_resolutions_rds <- paste("./resolution_values/resolution_df.rds", sep = "")
+    resolution_df <- readRDS(path_resolutions_rds)
+    
+    resolution_list <- resolution_df |>  filter(dataset == dataset_name)|> select(resolution)
+    resolution_list <- resolution_list$resolution
+    
+    # Community based on the resolution (Leiden)
+    
+    i <- 1
+    
+    for (resolution_value in resolution_list)
+    {
+      
+        set.seed() #Input seed
+      
+        # Leiden algorithm
+        
+        leiden_cluster <- cluster_leiden(graph, resolution = resolution_value)
+        
+        nodes_df_cluster <- nodes_df |> mutate(community_id = leiden_cluster$membership)|> relocate(community_id, .after = target)
+        
+        cv_folds <- custom_vfold_cv_graph_features(data = nodes_df_cluster, v = 5, repeats = 20, strata = target)
+
+        # Splits path
+        
+        output <- list("resolution" = resolution_value,"cv_splits"  = cv_folds)
+        
+        path_for_cv_res <- paste("./cv_splits/",dataset_name,"/graph/",dataset_name,"_cv_graph_",i,".rds", sep = "")
+        
+        file.remove(path_for_cv_res)
+        
+        saveRDS(output, file = path_for_cv_res)
+        
+        i <- i + 1
+    
+    }
+}
+```

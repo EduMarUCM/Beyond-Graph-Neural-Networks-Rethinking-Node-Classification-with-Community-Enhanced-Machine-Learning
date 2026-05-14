@@ -1,0 +1,325 @@
+---
+title: "CDA - Experiment"
+format:
+  html:
+    theme: [default, style.scss]
+    toc: true
+    toc-location: left
+    toc-title: indice
+    toc-depth: 5
+    fig-cap-location: margin
+editor: visual
+---
+
+[**Paquetes necesarios**]{.hl-yellow}
+
+```{r}
+#| message: false
+#| warning: false
+# paquetes
+rm(list = ls())
+#library(MASS)
+library(readxl)
+library(tidyverse)
+library(tidygraph)
+library(igraph)
+library(ggraph)
+library(glue)
+library(ggthemes)
+library(DT)
+library(tidymodels)
+library(ggpubr)
+library(stratification)
+library(sqldf)
+
+library(emayili)
+library(doParallel)
+library(tidymodels)
+source("./utils/set_models.R")
+```
+
+# Training
+
+## ML
+
+```{r}
+#| message: false
+#| warning: false
+
+# Input datasets: citeseer, cora, pubmed...
+
+dataset_names_list <- c("cora") 
+
+# Input ML models: Decision Tree, Logistic Regression, Neural Network, Random Forest, SVM Linear, XGBoost
+
+ml_models_list <- c("SVM Linear")
+
+for (dataset_name in dataset_names_list)
+{
+  
+# Step 0: Nodes path
+
+path_nodes_rds <- paste("./raw_data/",dataset_name,"/",dataset_name,"_nodes.rds", sep = "")
+
+nodes_df <- readRDS(path_nodes_rds)
+
+# Step 1: Splits for CV
+
+path_for_cv <- paste("./cv_splits/",dataset_name,"/ml/",dataset_name,"_cv_ml.rds", sep = "")
+
+cv_splits <- readRDS(path_for_cv)
+
+# Step 2: Recipe
+
+receta <- recipe(target ~ ., data = nodes_df |>  select(-node_id)) |>  
+          step_zv(all_predictors())|>                      
+          step_corr(all_predictors(),threshold = 0.95)  
+
+    for(ml_model in ml_models_list)
+    {
+        # Step 3: Model
+        
+        print(ml_model)
+      
+        model <- set_model_function(ml_model)
+        
+        # Step 4: Flow
+
+        workflow <- workflow() |> add_recipe(receta) |> add_model(model)
+       
+        # Step 5: Bayesian optimization for best parameter performance
+        
+        execution <- try({
+        
+        cl <- parallel::makeCluster(parallel::detectCores()-4)
+        registerDoParallel(cl)
+        
+        set.seed() #Input seed
+        bayesian_results <- tune_bayes( workflow,
+                                        resamples = cv_splits,
+                                        initial = 20,                    
+                                        iter = 40,                       
+                                        control = control_bayes(save_pred = TRUE, 
+                                                                verbose = TRUE,
+                                                                time_limit = 100,
+                                                                parallel_over = "everything", 
+                                                                allow_par = TRUE),
+                                        metrics = metric_set(accuracy)  
+                                        )
+        best_bayesian_results <- show_best(bayesian_results, metric = "accuracy")
+        
+        stopCluster(cl)
+        Sys.sleep(5)  
+
+        }, silent = TRUE)
+        
+        if (inherits(execution, "try-error")) 
+        {
+              print("Error")
+        } 
+        else 
+        {
+              # Save CV results on path
+              
+              path_for_bayesian_results <- paste("./results/",dataset_name,"/",ml_model,"/",dataset_name,"_cv_ml_results.rds", sep = "")
+              
+              file.remove(path_for_bayesian_results)
+              
+              saveRDS(best_bayesian_results, file = path_for_bayesian_results)
+        }
+    }
+}
+```
+
+## GRAPH
+
+```{r, eval=FALSE}
+#| message: false
+#| warning: false
+
+# Input datasets: citeseer, cora, pubmed...
+
+dataset_names_list <- c("cora") 
+
+# Input ML models: Decision Tree, Logistic Regression, Neural Network, Random Forest, SVM Linear, XGBoost
+
+ml_model <- "XGBoost"
+
+for (dataset_name in dataset_names_list)
+{
+
+i <- 1
+
+results_list <- list()
+
+# Step 1: Splits for CV
+
+path_carpeta <- paste("./cv_splits/",dataset_name,"/graph/", sep = "")
+archivos <- list.files(path = path_carpeta, full.names = TRUE)
+
+results_list <- list()
+
+for (path_archivo in archivos)
+{
+  resolution_cv_split <- readRDS(path_archivo)
+  
+  # Resolution
+  
+  res_value <- resolution_cv_split[["resolution"]]
+
+  # CV Split 
+  
+  cv_splits <- resolution_cv_split[["cv_splits"]]
+
+  data_example <- cv_splits[["splits"]][[1]][["data"]]
+ 
+  # Step 2: Recipe
+
+  receta <- recipe(target ~ ., data = data_example) |>  step_zv(all_predictors()) |> step_corr(all_numeric_predictors(), threshold = 0.95)
+
+  # Step 3: Model
+
+   model <- set_model_function(ml_model)
+  
+  # Step 4: Flow
+
+  workflow <- workflow() |> add_recipe(receta) |> add_model(model)
+
+  
+   # Step 5: Bayesian optimization for best parameter performance
+  
+   cl <- parallel::makeCluster(parallel::detectCores()-4)
+   registerDoParallel(cl)
+   
+   set.seed() #Input seed
+  
+   bayesian_results <- tune_bayes( workflow,
+                                        resamples = cv_splits,
+                                        initial = 10,                    
+                                        iter = 25,                       
+                                        control = control_bayes(save_pred = TRUE,
+                                                                verbose = TRUE,
+                                                                time_limit = 100,
+                                                                parallel_over = "everything",
+                                                                allow_par = TRUE),
+                                        metrics = metric_set(accuracy)  
+                                        )
+        
+   best_bayesian_results <- show_best(bayesian_results, metric = "accuracy")
+  
+   stopCluster(cl)
+   
+   # Keep results on results_list
+  
+   output <- list("resolution" = res_value,"cv_results"   = best_bayesian_results)
+    
+   results_list[[i]] <- output
+   
+   i <- i+1
+}
+   # Save CV results on path
+
+   path_for_bayesian_results <- paste("./results/",dataset_name,"/",ml_model,"/",dataset_name,"_cv_graph_results.rds", sep = "")
+
+   file.remove(path_for_bayesian_results)
+
+   saveRDS(results_list, file = path_for_bayesian_results)
+}
+```
+
+## GRAPH + ML
+
+```{r, eval=FALSE}
+#| message: false
+#| warning: false
+
+# Input datasets: citeseer, cora, pubmed...
+
+dataset_names_list <- c("cora") 
+
+# Input ML models: Decision Tree, Logistic Regression, Neural Network, Random Forest, SVM Linear, XGBoost
+
+ml_model <- "XGBoost"
+
+for (dataset_name in dataset_names_list)
+{
+
+i <- 1
+
+results_list <- list()
+
+# Step 1: Splits for CV
+
+path_carpeta <- paste("./cv_splits/",dataset_name,"/graph_ml/", sep = "")
+archivos <- list.files(path = path_carpeta, full.names = TRUE)
+
+results_list <- list()
+
+for (path_archivo in archivos)
+{
+  
+  resolution_cv_split <- readRDS(path_archivo)
+  
+  # Resolution
+  
+  res_value <- resolution_cv_split[["resolution"]]
+
+  # CV Split 
+  
+  cv_splits <- resolution_cv_split[["cv_splits"]]
+
+  data_example <- cv_splits[["splits"]][[1]][["data"]]
+ 
+  # Step 2: Recipe
+
+  receta <- recipe(target ~ ., data = data_example) |>  step_zv(all_predictors()) |> step_corr(all_numeric_predictors(), threshold = 0.95)
+
+  # Paso 3: Model
+
+   model <- set_model_function(ml_model)
+  
+  # Step 4: Flow
+
+  workflow <- workflow() |> add_recipe(receta) |> add_model(model)
+  
+   # Step 5: Bayesian optimization for best parameter performance
+  
+   cl <- parallel::makeCluster(parallel::detectCores()-4)
+   registerDoParallel(cl)
+   
+   set.seed() #Input seed
+  bayesian_results <- tune_bayes( workflow,
+                                        resamples = cv_splits,
+                                        initial = 10,                    
+                                        iter = 25,                       
+                                        control = control_bayes(save_pred = TRUE,
+                                                                verbose = TRUE,
+                                                                time_limit = 10,
+                                                                parallel_over = "everything",
+                                                                allow_par = TRUE),
+                                        metrics = metric_set(accuracy)  
+                                        )
+        
+   best_bayesian_results <- show_best(bayesian_results, metric = "accuracy"
+                                      
+   stopCluster(cl)
+   
+   # Keep results on results_list
+  
+   output <- list("resolution" = res_value,"cv_results"   = best_bayesian_results)
+    
+   results_list[[i]] <- output
+   
+   i <- i+1
+
+}
+   # Save CV results on path
+
+   path_for_bayesian_results <- paste("./results/",dataset_name,"/",ml_model,"/",dataset_name,"_cv_graph_ml_results.rds", sep = "")
+
+   file.remove(path_for_bayesian_results)
+
+   saveRDS(results_list, file = path_for_bayesian_results)
+
+}
+```
