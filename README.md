@@ -5,4 +5,5 @@
 
 ### 2_Experiment
 
-* The path for saving CV training results is specified after the “Save CV results on path” comment 
+* The path for saving CV training results is specified after the “Save CV results on path” comment
+* The CV training results path and files could not be created in this repository due to GitHub's specifications.
