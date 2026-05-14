@@ -1,6 +1,6 @@
 # Beyond Graph Neural Networks: Rethinking Node Classification with Community-Enhanced Machine Learning
 
-Repository containing the code and datasets used in the development of the article [Beyond Graph Neural Networks: Rethinking Node Classification with Community-Enhanced Machine Learning].
+Repository containing the code and datasets used in the development of the article Beyond Graph Neural Networks: Rethinking Node Classification with Community-Enhanced Machine Learning.
 
 ## Description
 
