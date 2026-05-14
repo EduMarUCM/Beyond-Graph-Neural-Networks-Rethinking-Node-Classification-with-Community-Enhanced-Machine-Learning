@@ -15,6 +15,7 @@ The main objective is to facilitate the reproducibility of the results and provi
 ├── images/                 # Images
 ├── raw_data/               # Original datasets
 ├── resolution_values/      # Resolutions for each dataset for Leiden algorithm
+├── results/                # Plots and Master Table with best performance
 ├── utils/                  # Required intermediate functions
 └── README.md
 ```
@@ -39,7 +40,7 @@ Known open-access graph datasets in Node Classification tasks
 
 ## Technologies Used
 
-R
+* Results_Table.xlsx 
 
 ## Other comments
 
@@ -52,7 +53,11 @@ R
 
 * The path for saving CV training results is specified after the “Save CV results on path” comment
 * The CV training results path and files could not be created in this repository due to GitHub's specifications.
-  
+
+#### results 
+
+* Results_Table.xlsx contains the best result for each dataset, model and scenario
+
 ## Author
 
 Eduardo Martinez Tena
