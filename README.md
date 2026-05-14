@@ -2,13 +2,13 @@
 
 Repository containing the code and datasets used in the development of the article [Beyond Graph Neural Networks: Rethinking Node Classification with Community-Enhanced Machine Learning].
 
-## Descripción
+## Description
 
-Este repositorio reúne los scripts, notebooks y conjuntos de datos empleados para los experimentos, análisis y resultados presentados en el trabajo de investigación.
+This repository gathers the scripts, notebooks, and datasets used for the experiments, analyses, and results presented in the research work.
 
-El objetivo principal es facilitar la reproducibilidad de los resultados y servir como material de apoyo para futuras investigaciones.
+The main objective is to facilitate the reproducibility of the results and provide supporting material for future research.
 
-## Contenido del repositorio
+## Repository Structure
 
 ── data/
 │   ├── raw/                # Datos originales
@@ -28,11 +28,11 @@ El objetivo principal es facilitar la reproducibilidad de los resultados y servi
 ├── requirements.txt        # Dependencias del proyecto
 └── README.md
 
-## Uso
+## Usage
 
-1. Clonar el repositorio
+1. Clone the repository
    
-3. Ejecutar el código:
+2. Run the code
    
    * 1_Splits
    * 2_Experiment
@@ -40,7 +40,7 @@ El objetivo principal es facilitar la reproducibilidad de los resultados y servi
 
 ## Datasets
 
-Los datasets utilizados en esta investigación incluyen:
+The datasets used in this research include:
 
 Dataset 1: descripción breve.
 
@@ -48,13 +48,11 @@ Dataset 2: descripción breve.
 
 Dataset 3: descripción breve.
 
-Si algún dataset no puede compartirse públicamente por motivos de licencia o privacidad, se indicará explícitamente.
-
-## Tecnologías utilizadas
+## Technologies Used
 
 R
 
-## Otros comentarios
+## Other comments
 
 #### 1_Splits
 
@@ -66,6 +64,6 @@ R
 * The path for saving CV training results is specified after the “Save CV results on path” comment
 * The CV training results path and files could not be created in this repository due to GitHub's specifications.
   
-## Autor
+## Author
 
 Eduardo Martinez Tena
